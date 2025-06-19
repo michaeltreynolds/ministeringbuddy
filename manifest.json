@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Ministering Buddy",
+  "version": "0.1",
+  "description": "Extends the usability of the ministering assignments flow in lds tools.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://lcr.churchofjesuschrist.org/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://lcr.churchofjesuschrist.org/*"
+      ],
+      "js": ["content.js"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Ministering Buddy"
+  }
+}

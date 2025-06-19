@@ -1,0 +1,96 @@
+
+
+I have HTML that shows a list of potential ministers "Unassigned Ministering..." and a list of "Unassigned households".
+
+I'd like to ignore some people on the list because they are bishops. 
+Would like to be able to click on a row/person in the unassigned ministering column on a "bishop" icon that would send that row to the bottom of the list under the heading bishops.
+Would like to be able to click on a NN button for "not now" that would send them to the bottom under a heading of "not now". 
+
+Would like to persist these names and ages in local storage so that when I reload the page they are still in the sublists at the bottom of the list.
+
+Some people have the same name so it will be helpful to include the age when filtering.
+
+Would also like to click an empty start that shines yellow when clicked next to their name. THis shouldn't move the row, but instead just let me know they've been starred.
+
+So the three icons are Bishop, NN, and a star. A fourth icon would be a "question mark" or "?". This woudl be like star except make a heavy bold green question mark when clicked, before being clicked it would be a medium grey.
+
+These items on the page are probably not initially available. Hopefully since this is a chrome extension the content.js will be injected after the content is loaded.
+
+For the items in unassigned households I also want the yellow star, question mark, and "NN" with the same behavior of moving the row to the bottom of the list for "NN" or "not now". These buttons should have a common definition for styling.
+
+I'd like this code to be written so there is not a lot of redundant JS code, but that functions are used for logical pieces of functionality. Please think through this step by step and produce a good solution that works well.
+
+When moving a bishop or a not now to the bottom of the list. Make sure it appends it to the list and is visible after clicking it down below.
+
+<div class="sc-bc0e77e3-0 gLLZnK">
+    <div class="sc-b78c45da-0 iWiCId">
+        <div class="sc-f8e370b3-0 bmahkA sc-caab3abd-0 jFzPqE">Unassigned Ministering Brothers</div>
+        <div class="sc-787da19f-0 cERjnn sc-a3ecdf16-0 cJIPpf">
+            <button aria-haspopup="true" class="sc-ea7981b1-0 bvvzuJ sc-787da19f-1 iUBIaz" style="display: flex; align-items: center;">
+                Sort By
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="presentation" style="width: 1em; height: 1em;">
+                    <path fill="currentColor" d="M7.24 9.69c-.404-.38-.286-.69.264-.69h8.993c.549 0 .666.31.264.69l-4.4 4.169a.527.527 0 0 1-.721 0L7.24 9.69Z"></path>
+                </svg>
+            </button>
+        </div>
+        <table class="sc-41eefb22-0 jbzcWL">
+            <thead class="sc-9992d24a-0 fAJkcv">
+                <tr class="sc-4de05dbe-0 kEtZLW"></tr>
+            </thead>
+            <tbody class="sc-89cff581-0 llVfZB">
+                <tr class="sc-4de05dbe-0 kEtZLW">
+                    <td class="sc-b47d57b-0 lOygr sc-f6973970-0 fBgscK">
+                        <div class="sc-4acbc3fb-0 dUIGET"><a tabindex="0" aria-haspopup="true" class="sc-14fff288-0 llFqzd sc-10578110-4 krlvrk sc-10578110-0 keZDYE"> Jones, Bob </a></div>
+                    </td>
+                    <td class="sc-b47d57b-0 lOygr sc-f6973970-0 fBgscK">
+                        <div>
+                            <div class="sc-836fee13-0 cvofLr">Age</div>
+                            <div>68</div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="sc-4de05dbe-0 kEtZLW">
+                    <td class="sc-b47d57b-0 lOygr sc-f6973970-0 fBgscK">
+                        <div class="sc-4acbc3fb-0 dUIGET"><a tabindex="0" aria-haspopup="true" class="sc-14fff288-0 llFqzd sc-10578110-4 krlvrk sc-10578110-0 keZDYE"> Keller, Barnaby </a></div>
+                    </td>
+                    <td class="sc-b47d57b-0 lOygr sc-f6973970-0 fBgscK">
+                        <div>
+                            <div class="sc-836fee13-0 cvofLr">Age</div>
+                            <div>25</div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="sc-8287a757-0 YrLtZ">Count: 49</div>
+    </div>
+    <div class="sc-333a1eda-0 ebhVDh">
+        <div class="sc-f8e370b3-0 bmahkA sc-caab3abd-0 jFzPqE">Unassigned Households</div>
+        <div class="sc-787da19f-0 cERjnn sc-a3ecdf16-0 cJIPpf">
+            <button aria-haspopup="true" class="sc-ea7981b1-0 bvvzuJ sc-787da19f-1 iUBIaz" style="display: flex; align-items: center;">
+                Sort By
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="presentation" style="width: 1em; height: 1em;">
+                    <path fill="currentColor" d="M7.24 9.69c-.404-.38-.286-.69.264-.69h8.993c.549 0 .666.31.264.69l-4.4 4.169a.527.527 0 0 1-.721 0L7.24 9.69Z"></path>
+                </svg>
+            </button>
+        </div>
+        <table class="sc-41eefb22-0 jbzcWL">
+            <thead class="sc-9992d24a-0 fAJkcv">
+                <tr class="sc-4de05dbe-0 kEtZLW"></tr>
+            </thead>
+            <tbody class="sc-89cff581-0 llVfZB">
+                <tr class="sc-4de05dbe-0 kEtZLW">
+                    <td class="sc-b47d57b-0 lOygr sc-f6973970-0 fBgscK">
+                        <div class="sc-4acbc3fb-0 dePJAP"><a tabindex="0" aria-haspopup="true" class="sc-14fff288-0 llFqzd sc-cdecc425-0 jxrKGm"> Gerber, Allison </a></div>
+                    </td>
+                </tr>
+                <tr class="sc-4de05dbe-0 kEtZLW">
+                    <td class="sc-b47d57b-0 lOygr sc-f6973970-0 fBgscK">
+                        <div class="sc-4acbc3fb-0 dePJAP"><a tabindex="0" aria-haspopup="true" class="sc-14fff288-0 llFqzd sc-cdecc425-0 jxrKGm"> Frankworth, Bert &amp; Ernie </a></div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="sc-8287a757-0 YrLtZ">Count: 48</div>
+    </div>
+</div>
