@@ -1,0 +1,27 @@
+{
+  "name": "ministeringbuddy",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Chrome extension for elders quorum ministering changes",
+  "scripts": {
+    "dev": "wxt",
+    "build": "wxt build",
+    "build:bridge": "wxt build --mode bridge",
+    "check:store": "node scripts/check-store-build.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "node e2e/bridge.e2e.mjs",
+    "test:mutation": "node scripts/mutation-check.mjs",
+    "postinstall": "wxt prepare"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "jsdom": "^29.1.1",
+    "playwright": "^1.64.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.12",
+    "ws": "^8.22.1",
+    "wxt": "^0.21.5"
+  }
+}

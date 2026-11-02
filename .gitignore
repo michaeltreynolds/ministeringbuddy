@@ -1,0 +1,7 @@
+node_modules/
+.output/
+.wxt/
+.bridge-token
+e2e/.profile/
+# Unsanitized captures must never be committed. Sanitized fixtures go in tests/fixtures/.
+private/
