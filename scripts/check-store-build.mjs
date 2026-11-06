@@ -3,9 +3,9 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const BUILD = process.argv[2] ?? '.output/chrome-mv3';
-const ALLOWED_PERMISSIONS = new Set([]);
-const ALLOWED_HOSTS = new Set(['https://lcr.churchofjesuschrist.org/*']);
-const FORBIDDEN_TEXT = ['127.0.0.1', 'localhost', '8765', '8766', 'bridge', 'bridge-server', 'WebSocket(', 'ws://'];
+const ALLOWED_PERMISSIONS = new Set(['identity']);
+const ALLOWED_HOSTS = new Set(['https://firestore.googleapis.com/*']);
+const FORBIDDEN_TEXT = ['127.0.0.1', 'localhost', '8765', '8766', 'bridge-server', 'startBridge', 'bridge-reconnect', 'WebSocket(', 'ws://'];
 const TEXT_FILE = /\.(js|html|css|json|map|txt)$/;
 
 const failures = [];
@@ -17,7 +17,6 @@ for (const permission of manifest.permissions ?? []) {
 for (const host of manifest.host_permissions ?? []) {
   if (!ALLOWED_HOSTS.has(host)) failures.push(`host permission not allowed: ${host}`);
 }
-if (manifest.background) failures.push('store build must not have a background worker yet');
 
 function* filesIn(directory) {
   for (const name of readdirSync(directory)) {

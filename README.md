@@ -12,8 +12,7 @@ real data shapes are captured.
 
 - **Compute from LCR.** Anything LCR already knows (callings, assignments, move-ins) is read live, not stored.
 - **Store only what LCR can't know:** the presidency's category choices, from a fixed list with no free text.
-- **Sync through Chrome, opaque to Google.** Planned: entries keyed by a keyed hash of the member ID,
-  with encrypted values and a secret entered once per device.
+- **Saved in Firestore** in the church-mt project, reached with the Google account Chrome is signed in to.
 - **Read-only first.** Writing to the Proposed Assignments sandbox comes later. Publishing stays a manual click in LCR.
 
 The June 2025 prototype is in the git history, and its requirements are in
@@ -57,3 +56,13 @@ of real pages, because those can't be sanitized reliably. Screenshots are for th
 **Known limit:** when learning an unknown API, `fetch` shows identifier-like field names. A small map keyed by
 a lowercase first name that appears nowhere in the values could show that name. Wide maps are hidden, and
 field names should be reviewed the first time an endpoint is captured.
+
+## Cloud storage
+
+Data is saved in Firestore in the church-mt project. The extension asks Chrome for a Google token for the
+signed-in profile (the `identity` permission and the `oauth2` manifest section), then calls Firestore's REST
+API. Access is controlled by IAM on church-mt, so only accounts with a role there can read or write.
+There's no API key and no Firebase web app.
+
+The extension ID is fixed at `kdodgbabpmjhbbehpmcnhfkeeiceaiec` by the public `key` in the manifest, so the
+OAuth client works on every computer. The OAuth client ID goes in `src/config.ts`.

@@ -7,11 +7,18 @@
       body {
         font-family: sans-serif;
         margin: 16px;
-        min-width: 220px;
+        min-width: 260px;
       }
       a {
         color: #1976d2;
         font-weight: bold;
+      }
+      button {
+        margin-top: 12px;
+      }
+      #cloud-status {
+        margin-top: 8px;
+        font-size: 13px;
       }
     </style>
   </head>
@@ -20,5 +27,8 @@
     <a href="https://lcr.churchofjesuschrist.org/ministering-proposed-assignments?type=EQ&tab=unassigned" target="_blank">
       Go to Unassigned Ministering
     </a>
+    <div><button id="test-cloud" type="button">Test cloud connection</button></div>
+    <div id="cloud-status"></div>
+    <script type="module" src="./main.ts"></script>
   </body>
 </html>
