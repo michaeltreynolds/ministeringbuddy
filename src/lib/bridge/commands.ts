@@ -21,7 +21,8 @@ export type BridgeCommand =
   | { command: 'scripts' }
   | { command: 'embedded'; index: number }
   | { command: 'next'; path: string }
-  | { command: 'outline'; path: string };
+  | { command: 'outline'; path: string }
+  | { command: 'box'; selector: string };
 
 export type BridgeResult = SanitizeResult | { ok: false; error: string };
 
@@ -232,6 +233,26 @@ function runOutline(path: string): Promise<BridgeResult> {
   });
 }
 
+/** Where an element is and whether it can be seen. Geometry and styles only, never text. */
+function runBox(selector: string): BridgeResult {
+  const describe = (element: Element) => {
+    const rect = element.getBoundingClientRect();
+    const style = getComputedStyle(element);
+    return `${element.localName}: x=${Math.round(rect.x)} y=${Math.round(rect.y)} w=${Math.round(rect.width)} h=${Math.round(rect.height)} display=${style.display} visibility=${style.visibility} position=${style.position} z=${style.zIndex} opacity=${style.opacity}`;
+  };
+  const element = document.querySelector(selector);
+  if (!element) return { ok: false, error: 'No element matches that selector.' };
+  const lines = [`viewport: ${innerWidth}x${innerHeight} scrollY=${Math.round(scrollY)}`, describe(element)];
+  for (const child of Array.from(element.shadowRoot?.children ?? [])) if (child.localName !== 'style') lines.push(`  shadow ${describe(child)}`);
+  for (let parent = element.parentElement; parent; parent = parent.parentElement) {
+    const style = getComputedStyle(parent);
+    if (style.transform !== 'none' || style.filter !== 'none' || style.contain !== 'none' || style.overflow !== 'visible') {
+      lines.push(`  ancestor ${parent.localName}: transform=${style.transform} filter=${style.filter} contain=${style.contain} overflow=${style.overflow}`);
+    }
+  }
+  return { ok: true, output: lines.join('\n') };
+}
+
 export async function runBridgeCommand(request: BridgeCommand): Promise<BridgeResult> {
   switch (request.command) {
     case 'status':
@@ -250,6 +271,8 @@ export async function runBridgeCommand(request: BridgeCommand): Promise<BridgeRe
       return runNext(request.path);
     case 'outline':
       return runOutline(request.path);
+    case 'box':
+      return runBox(request.selector);
     default:
       return { ok: false, error: 'Unknown command.' };
   }
