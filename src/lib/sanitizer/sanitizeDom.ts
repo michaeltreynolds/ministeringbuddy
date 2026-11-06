@@ -1,4 +1,4 @@
-import { hasLeaks, scanForLeaks } from './leakScan';
+import { hasLeaks, scanForLeaks, wordsOf } from './leakScan';
 import { isAllowedLabel, type SanitizerPolicy } from './policy';
 import type { Pseudonymizer } from './pseudonymizer';
 import type { SanitizeResult } from './result';
@@ -22,6 +22,7 @@ function escapeHtml(value: string): string {
 
 class DomSanitizer {
   readonly sensitive = new Set<string>();
+  readonly opaqueWords = new Set<string>();
   #elements = 0;
 
   constructor(
@@ -50,7 +51,10 @@ class DomSanitizer {
     for (const { name, value } of Array.from(element.attributes)) {
       if (name === 'class') {
         const tokens = value.trim().split(/\s+/).filter(Boolean);
-        for (const token of tokens) if (!isGeneratedClass(token)) this.sensitive.add(token);
+        for (const token of tokens) {
+          if (!isGeneratedClass(token)) this.sensitive.add(token);
+          else for (const word of wordsOf(token)) this.opaqueWords.add(word);
+        }
         const shown = tokens.map((token) => (isGeneratedClass(token) ? token : '[class]'));
         if (shown.length) parts.push(`class="${shown.join(' ')}"`);
       } else if (VISIBLE.has(name)) {
@@ -100,6 +104,7 @@ export function sanitizeDom(root: Element, policy: SanitizerPolicy, session: Pse
     sensitive: sanitizer.sensitive,
     alwaysBlock: policy.extraSensitive,
     safeWords: buildSafeWords(policy),
+    opaqueWords: sanitizer.opaqueWords,
   });
   return hasLeaks(findings) ? { ok: false, findings } : { ok: true, output };
 }

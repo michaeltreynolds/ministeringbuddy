@@ -15,7 +15,9 @@ export type BridgeCommand =
   | { command: 'status' }
   | { command: 'dom'; selector?: string }
   | { command: 'fetch'; path: string }
-  | { command: 'network' };
+  | { command: 'network' }
+  | { command: 'scripts' }
+  | { command: 'embedded'; index: number };
 
 export type BridgeResult = SanitizeResult | { ok: false; error: string };
 
@@ -35,6 +37,17 @@ function namesOnPage(root: ParentNode): Set<string> {
     }
   }
   return words;
+}
+
+/** Whole names shown on the page, so discovery never reveals them as field names or values. */
+function pageNames(): string[] {
+  return LCR_POLICY.personSelectors.flatMap((selector) =>
+    Array.from(document.querySelectorAll(selector), (element) => element.textContent?.trim() ?? '').filter(Boolean),
+  );
+}
+
+function discoveryPolicy(): SanitizerPolicy {
+  return { ...DISCOVERY_POLICY, extraSensitive: pageNames() };
 }
 
 function runStatus(): BridgeResult {
@@ -59,7 +72,7 @@ async function runFetch(path: string): Promise<BridgeResult> {
   let result: SanitizeResult;
   if (contentType.includes('json')) {
     try {
-      result = sanitizeJson(JSON.parse(body), DISCOVERY_POLICY, session);
+      result = sanitizeJson(JSON.parse(body), discoveryPolicy(), session);
     } catch {
       return { ok: true, output: `${header}[unparseable JSON]` };
     }
@@ -75,12 +88,38 @@ async function runFetch(path: string): Promise<BridgeResult> {
 function runNetwork(): BridgeResult {
   const blocked = namesOnPage(document);
   const paths = new Set<string>();
-  for (const entry of performance.getEntriesByType('resource') as PerformanceResourceTiming[]) {
+  const entries = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
+  for (const entry of entries) {
     if (entry.initiatorType === 'fetch' || entry.initiatorType === 'xmlhttprequest') {
       paths.add(sanitizeUrl(entry.name, location.href, blocked));
     }
   }
-  return { ok: true, output: [...paths].sort().join('\n') };
+  return { ok: true, output: `resource entries: ${entries.length}\n${[...paths].sort().join('\n')}` };
+}
+
+const SAFE_ID = /^[_a-zA-Z][\w-]{0,40}$/;
+
+/** Every script tag: its type, a safe id, where it loads from, and the size of any inline text. */
+function runScripts(): BridgeResult {
+  const blocked = namesOnPage(document);
+  const lines = Array.from(document.scripts).map((script, index) => {
+    const safeId = SAFE_ID.test(script.id) && !/\d{5,}/.test(script.id);
+    const id = script.id ? (safeId ? script.id : '[id]') : '';
+    const source = script.src ? sanitizeUrl(script.src, location.href, blocked) : `inline, ${script.text.length} chars`;
+    return `${index}\t${script.type || 'classic'}\t${id}\t${source}`;
+  });
+  return { ok: true, output: lines.join('\n') };
+}
+
+/** The sanitized shape of an inline JSON script, such as Next.js page data. */
+function runEmbedded(index: number): BridgeResult {
+  const script = document.scripts[index];
+  if (!script || script.src) return { ok: false, error: 'No inline script at that index.' };
+  try {
+    return sanitizeJson(JSON.parse(script.text), discoveryPolicy(), session);
+  } catch {
+    return { ok: false, error: 'That script is not JSON.' };
+  }
 }
 
 export async function runBridgeCommand(request: BridgeCommand): Promise<BridgeResult> {
@@ -93,6 +132,10 @@ export async function runBridgeCommand(request: BridgeCommand): Promise<BridgeRe
       return runFetch(request.path);
     case 'network':
       return runNetwork();
+    case 'scripts':
+      return runScripts();
+    case 'embedded':
+      return runEmbedded(Number(request.index));
     default:
       return { ok: false, error: 'Unknown command.' };
   }

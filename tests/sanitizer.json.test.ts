@@ -233,3 +233,83 @@ describe('sanitizeJson: randomized canaries', () => {
     expect(passed).toBeGreaterThan(1000); // the sanitizer must redact, not just block everything
   });
 });
+
+describe('sanitizeJson: false alarms seen on real LCR data', () => {
+  const DISCOVER = { ...EMPTY, discoverKeys: true };
+
+  it('does not block when a marker counter equals a real ID', () => {
+    // 12,346 distinct strings push the marker counter past an ID that is also in the data.
+    const raw = { ids: [12345678, 23456], values: Array.from({ length: 12346 }, (_, i) => `value ${i}`) };
+    expect(sanitizeJson(raw, EMPTY, new Pseudonymizer()).ok).toBe(true);
+  });
+
+  it('does not block when a raw word appears inside a camelCase field name', () => {
+    const output = run({ householdId: 'x', assignmentList: 'x', label: 'House Sign' }, DISCOVER);
+    expect(output).toContain('householdId');
+    expect(output).toContain('assignmentList');
+    expect(output).not.toMatch(/House|Sign/);
+  });
+
+  it('hides a run-together key that contains a raw word', () => {
+    expect(run({ smithjones: 1, owner: 'Bob Jones' }, DISCOVER)).not.toMatch(/smithjones/);
+  });
+});
+
+describe('sanitizeJson: keys hidden in a wide map stay hidden elsewhere', () => {
+  it('hides a field name that is also a key in a map keyed by person', () => {
+    const byPerson = Object.fromEntries(Array.from({ length: 60 }, (_, i) => [`person${i}`, 1]));
+    byPerson.jones = 1;
+    const result = sanitizeJson({ byPerson, profile: { jones: 1 } }, { ...EMPTY, discoverKeys: true }, new Pseudonymizer());
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.output).not.toMatch(/jones/i);
+  });
+});
+
+describe('sanitizeJson: repeated field names are schema', () => {
+  const DISCOVER = { ...EMPTY, discoverKeys: true };
+  const rows = (n: number) => Array.from({ length: n }, (_, i) => ({ pageProps: i, name: `Row name ${i}` }));
+
+  it('shows a field name found in several objects, even if its words appear in values', () => {
+    const output = run({ rows: rows(3), title: 'Page props and name' }, DISCOVER);
+    expect(output).toContain('pageProps');
+    expect(output).toContain('"name"');
+    expect(output).not.toMatch(/Row|Page props/);
+  });
+
+  it('still hides a field name seen only once if its words appear in values', () => {
+    expect(run({ rows: rows(1), title: 'Page props' }, DISCOVER)).not.toContain('pageProps');
+  });
+
+  it('never shows a known name as a field name, however often it repeats', () => {
+    const raw = { a: { jones: 1 }, b: { jones: 2 }, c: { jones: 3 } };
+    const result = sanitizeJson(raw, { ...DISCOVER, extraSensitive: ['Jones, Bob'] }, new Pseudonymizer());
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.output).not.toMatch(/jones/i);
+  });
+});
+
+describe('sanitizeJson: ID-like field names', () => {
+  it('hides keys that look like IDs, even when they repeat', () => {
+    const id = 'a3f9c2e1b7d04e5f8a6b9c0d1e2f3a4b';
+    const output = run({ x: { [id]: 1 }, y: { [id]: 2 }, z: { [id]: 3 }, w: { m12345678: 1 } }, { ...EMPTY, discoverKeys: true });
+    expect(output).not.toContain(id);
+    expect(output).not.toContain('12345678');
+  });
+
+  it('allows a short numeric suffix', () => {
+    expect(run({ address2: 1 }, { ...EMPTY, discoverKeys: true })).toContain('address2');
+  });
+});
+
+describe('leak scan: long tokens', () => {
+  it('does not mistake a long camelCase field name for a token', () => {
+    const key = 'ministeringAssignmentsUnassignedList'; // 35 letters
+    const output = run({ a: { [key]: 1 }, b: { [key]: 2 }, c: { [key]: 3 } }, { ...EMPTY, discoverKeys: true });
+    expect(output).toContain(key);
+  });
+
+  it('still blocks a long token with digits', () => {
+    const policy = { ...EMPTY, labelPatterns: [/.*/] };
+    expect(sanitizeJson('abc123def456ghi789jkl012mno345pqr678', policy, new Pseudonymizer()).ok).toBe(false);
+  });
+});

@@ -96,3 +96,17 @@ describe('sanitizeDom: places a name can hide', () => {
     expect(output).not.toContain('Bob');
   });
 });
+
+describe('sanitizeDom: generated class names', () => {
+  it('does not block when a random class name happens to contain a redacted word', () => {
+    // "dead" is redacted page text, and the generated class "sc-0dead1-0" contains it by chance.
+    const output = run('<div class="sc-0dead1-0"><p>dead</p></div>');
+    expect(output).toContain('sc-0dead1-0');
+    expect(output).not.toMatch(/>dead</);
+  });
+
+  it('still blocks a class name that is exactly a redacted word', () => {
+    const result = sanitizeDom(dom('<div class="sc-0dead1-0"><p>0dead1</p></div>'), EMPTY, new Pseudonymizer());
+    expect(result.ok).toBe(false);
+  });
+});

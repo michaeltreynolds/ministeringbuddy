@@ -7,9 +7,9 @@ const S = 'src/lib/sanitizer/';
 const MUTATIONS = [
   ['JSON strings pass through', S + 'sanitizeJson.ts', "return `[string#${this.session.number('string', value)}, ${value.length} chars]`;", 'return value;'],
   ['JSON numbers pass through', S + 'sanitizeJson.ts', "return '[number]';", 'return value;'],
-  ['unknown keys always shown', S + 'sanitizeJson.ts', 'if (!this.policy.discoverKeys || siblingCount > MAX_DISCOVERABLE_KEYS) return false;', 'return true;'],
-  ['raw-word check on keys removed', S + 'sanitizeJson.ts', 'return !wordsOf(splitCamel(key)).some((word) => this.#rawWords.has(word));', 'return true;'],
-  ['wide-map check removed', S + 'sanitizeJson.ts', ' || siblingCount > MAX_DISCOVERABLE_KEYS', ''],
+  ['unknown keys always shown', S + 'sanitizeJson.ts', 'if (!this.policy.discoverKeys) return false;', 'return true;'],
+  ['raw-word check on keys removed', S + 'sanitizeJson.ts', 'if (parts.some((word) => this.#rawWords.has(word))) return false;', ''],
+  ['wide-map detection removed', S + 'sanitizeJson.ts', 'keys.length > MAX_DISCOVERABLE_KEYS', 'false'],
   ['enum check removed', S + 'sanitizeJson.ts', "typeof value === 'string' && rule.values.includes(value) ? value", "typeof value === 'string' ? value"],
   ['leak scan disabled', S + 'leakScan.ts', 'return findings;', 'return {};'],
   ['accent folding removed', S + 'leakScan.ts', ".replace(/\\p{M}/gu, '')", ''],
@@ -24,6 +24,12 @@ const MUTATIONS = [
   ['URL parts unchecked', S + 'sanitizeUrl.ts', 'SAFE_SEGMENT.test(part) && !/\\d{5,}/.test(part) && !wordsOf(part).some((word) => blockedWords.has(word));', 'true;'],
   ['other hosts shown', S + 'sanitizeUrl.ts', "SAFE_HOST.test(url.hostname) ? url.hostname : '[other-host]'", 'url.hostname'],
   ['mapping serializable', S + 'pseudonymizer.ts', "return '[Pseudonymizer]';", 'return JSON.stringify([...this.#assigned]);'],
+  ['run-together key check removed', S + 'sanitizeJson.ts', 'if (parts.length === 1 && key.length >= 6) {', 'if (false) {'],
+  ['marker stripping catches real text', S + 'leakScan.ts', "const withoutMarkers = output.replace(MARKERS, ' ');", "const withoutMarkers = output.replace(/[A-Za-z]+/g, ' ');"],
+  ['wide-map keys not collected', S + 'sanitizeJson.ts', 'if (wide || !IDENTIFIER_KEY.test(key)) for', 'if (false) for'],
+  ['known names allowed as schema keys', S + 'sanitizeJson.ts', 'if (parts.some((word) => this.#knownNameWords.has(word))) return false;', ''],
+  ['schema repeat threshold ignored', S + 'sanitizeJson.ts', 'if ((this.#keyCounts.get(key) ?? 0) >= SCHEMA_REPEATS) {', 'if (true) {'],
+  ['ID-like keys allowed', S + 'sanitizeJson.ts', String.raw`const IDENTIFIER_KEY = /^[a-zA-Z_][a-zA-Z_]{0,36}\d{0,3}$/;`, 'const IDENTIFIER_KEY = /^[a-zA-Z_][a-zA-Z0-9_]{0,40}$/;'],
   ['same-origin check weakened', 'src/lib/bridge/commands.ts', 'return /^\\/(?![/\\\\])/.test(path) && !/[\\\\\\s]/.test(path);', "return path.startsWith('/');"],
 ];
 

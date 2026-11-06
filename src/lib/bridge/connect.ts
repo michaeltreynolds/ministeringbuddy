@@ -20,6 +20,10 @@ async function handle(request: { command: string; [key: string]: unknown }): Pro
   }
   const tabId = await targetTab();
   if (tabId === undefined) return { ok: false, error: 'No LCR tab is open.' };
+  if (request.command === 'reload-page') {
+    await browser.tabs.reload(tabId);
+    return { ok: true, output: 'page reloading' };
+  }
   try {
     return await browser.tabs.sendMessage(tabId, request);
   } catch {

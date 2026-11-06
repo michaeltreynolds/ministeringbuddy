@@ -53,9 +53,10 @@ The bridge is read-only by construction: it can only send same-origin GET reques
 that writes. It uses the browser's signed-in session and never handles auth tokens. It never takes screenshots
 of real pages, because those can't be sanitized reliably. Screenshots are for the mock only.
 
-**Known limit:** when learning an unknown API, `fetch` shows identifier-like field names. A small map keyed by
-a lowercase first name that appears nowhere in the values could show that name. Wide maps are hidden, and
-field names should be reviewed the first time an endpoint is captured.
+**Field names in discovery mode.** To learn an unknown structure, `fetch` and `embedded` show field names that
+look like words (no IDs). A name found in three or more objects counts as schema; others are shown only if none
+of their words appear in the data. Names shown on the page are never shown as field names. The remaining risk is
+a field name that is a person's name and repeats in several objects, which is unlikely in real data.
 
 ## Cloud storage
 

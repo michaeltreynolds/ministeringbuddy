@@ -5,7 +5,10 @@ import { runBridgeCommand, type BridgeCommand } from '../lib/bridge/commands';
 
 export default defineContentScript({
   matches: ['https://lcr.churchofjesuschrist.org/*', 'http://127.0.0.1:8766/*'],
+  runAt: 'document_start',
   main() {
+    // Keep more of the page's requests visible to the network command; the default keeps only 250.
+    performance.setResourceTimingBufferSize(5000);
     browser.runtime.onMessage.addListener((message: unknown) => {
       return runBridgeCommand(message as BridgeCommand).catch(() => ({
         ok: false,

@@ -7,10 +7,9 @@ import { WebSocketServer } from 'ws';
 
 const PORT = 8765;
 const TIMEOUT_MS = 30_000;
-const ALLOWED_COMMANDS = new Set(['status', 'dom', 'fetch', 'network', 'reload']);
+const ALLOWED_COMMANDS = new Set(['status', 'dom', 'fetch', 'network', 'scripts', 'embedded', 'reload', 'reload-page']);
 
 const token = randomBytes(24).toString('hex');
-writeFileSync('.bridge-token', token, { mode: 0o600 });
 
 let extension;
 let nextId = 1;
@@ -67,4 +66,9 @@ sockets.on('connection', (socket) => {
   socket.on('close', () => console.log('extension disconnected'));
 });
 
-server.listen(PORT, '127.0.0.1', () => console.log(`bridge listening on 127.0.0.1:${PORT}`));
+// The token is written only once listening succeeds, so a second copy that fails to start
+// can't overwrite the running server's token.
+server.listen(PORT, '127.0.0.1', () => {
+  writeFileSync('.bridge-token', token, { mode: 0o600 });
+  console.log(`bridge listening on 127.0.0.1:${PORT}`);
+});

@@ -2,7 +2,9 @@
 // Findings hold counts only, so a blocked result can never echo the value it caught.
 
 export type LeakKind =
-  | 'sensitive-value'
+  | 'known-name' // a caller-supplied value appeared whole
+  | 'sensitive-value' // a word from a redacted value appeared as a word
+  | 'sensitive-substring' // a word from a redacted value appeared inside a longer word
   | 'email'
   | 'phone'
   | 'membership-number'
@@ -17,12 +19,15 @@ const PATTERNS: ReadonlyArray<[LeakKind, RegExp]> = [
   ['membership-number', /(?<![\w-])\d{3}-\d{4}-\d{4}(?![\w-])/g],
   ['phone', /(?<![\w-])(?:\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}(?![\w-])/g],
   ['long-digits', /(?<![\w-])\d{7,}(?![\w-])/g],
-  ['long-token', /[A-Za-z0-9_-]{32,}/g],
+  // Tokens and hashes mix letters and digits. A long all-letter run is a camelCase field name.
+  ['long-token', /(?<![\w-])(?=[\w-]*\d)(?=[\w-]*[A-Za-z])[\w-]{32,}(?![\w-])/g],
   [
     'street-address',
     /\b\d{1,6}\s+(?:[NSEW]\.?\s+)?[A-Za-z][A-Za-z.]*(?:\s+[A-Za-z.]+){0,3}\s+(?:street|st|avenue|ave|road|rd|drive|dr|lane|ln|court|ct|circle|cir|way|boulevard|blvd|place|pl)\b/gi,
   ],
 ];
+
+const MARKERS = /\[(?:string|text|key)#\d+(?:, \d+ chars)?\]|\b(?:Person|Household|Id)_\d+\b/g;
 
 // Letters without accents, so "José" and "Jose" compare equal.
 export function foldText(value: string): string {
@@ -49,9 +54,14 @@ export interface LeakScanInput {
   alwaysBlock?: Iterable<string>;
   /** The output's own vocabulary. A member surnamed "Bishop" must not block every label. */
   safeWords: ReadonlySet<string>;
+  /**
+   * Random identifiers in the output, such as generated class names. They are still checked for whole-word
+   * matches, but not for words hidden inside them, since a random "b7dead1" contains "dead" by chance.
+   */
+  opaqueWords?: ReadonlySet<string>;
 }
 
-export function scanForLeaks({ output, sensitive, alwaysBlock = [], safeWords }: LeakScanInput): LeakFindings {
+export function scanForLeaks({ output, sensitive, alwaysBlock = [], safeWords, opaqueWords = new Set() }: LeakScanInput): LeakFindings {
   const findings: LeakFindings = {};
   const add = (kind: LeakKind, count = 1) => {
     findings[kind] = (findings[kind] ?? 0) + count;
@@ -65,10 +75,12 @@ export function scanForLeaks({ output, sensitive, alwaysBlock = [], safeWords }:
   const foldedOutput = foldText(output).replace(/\s+/g, ' ');
   for (const value of alwaysBlock) {
     const folded = foldText(value).trim().replace(/\s+/g, ' ');
-    if (folded && foldedOutput.includes(folded)) add('sensitive-value');
+    if (folded && foldedOutput.includes(folded)) add('known-name');
   }
 
-  const outputWords = new Set(wordsOf(output).filter((word) => !safeWords.has(word)));
+  // The sanitizer's own markers carry counters such as "string#12345" that can equal a real ID by chance.
+  const withoutMarkers = output.replace(MARKERS, ' ');
+  const outputWords = new Set(wordsOf(withoutMarkers).filter((word) => !safeWords.has(word)));
   const wordsToFind = new Set<string>();
   for (const value of [...sensitive, ...alwaysBlock]) {
     for (const word of wordsOf(value)) {
@@ -81,8 +93,9 @@ export function scanForLeaks({ output, sensitive, alwaysBlock = [], safeWords }:
     } else if (word.length >= 4) {
       // Catches run-together forms such as "BobJones" in a class name.
       for (const candidate of outputWords) {
+        if (opaqueWords.has(candidate)) continue;
         if (candidate.includes(word)) {
-          add('sensitive-value');
+          add('sensitive-substring');
           break;
         }
       }
