@@ -18,6 +18,8 @@ to `main` when a task is finished.
 - A fixed list in code, never user-editable, with no free-text field. A category says what the situation is or
   records a person's own request. It never records their circumstances.
 - Compute facts from LCR rather than storing them. "Bishop" is inferred from the calling.
+n## Cloud
+
 - Data lives in Firestore in church-mt (us-west3), accessed over REST with a Chrome identity token. IAM on the project is the only lock, so never add API keys, a Firebase web app, or other accounts. Michael chose no client-side encryption.
 
 ## Before committing
