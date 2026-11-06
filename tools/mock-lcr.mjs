@@ -4,6 +4,7 @@ import { createServer } from 'node:http';
 
 const PORT = 8766;
 const PAGE = readFileSync('tests/fixtures/unassigned-page.html', 'utf8');
+const NEXT_DATA = readFileSync('tests/fixtures/ministering-next-data.json', 'utf8');
 
 const UNASSIGNED = {
   districtName: 'Elm',
@@ -14,6 +15,7 @@ const UNASSIGNED = {
 };
 
 const html = `<!doctype html><html><head><title>Mock LCR</title></head><body>${PAGE}
+<script id="__NEXT_DATA__" type="application/json">${NEXT_DATA}</script>
 <script>fetch('/api/ministering/unassigned?unitNumber=12345&name=Jones');</script></body></html>`;
 
 const writes = [];

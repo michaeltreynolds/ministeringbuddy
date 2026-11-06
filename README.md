@@ -4,9 +4,10 @@ A Chrome extension to make ministering changes easier for an elders quorum presi
 It works alongside Leader and Clerk Resources (LCR) and is not affiliated with or endorsed by
 The Church of Jesus Christ of Latter-day Saints.
 
-**Status:** foundation only. The store build is just a popup with a link to LCR. The development
-bridge and sanitizer are built and tested against a mock LCR. The categories come next, once LCR's
-real data shapes are captured.
+**Status:** on LCR's EQ Proposed Assignments page, a **Categories** button opens a panel that groups every
+brother, household and companionship by category, with "Needs a decision" first. Small icons set a category;
+choices are saved to Firestore. The extension never writes to LCR. Not yet built: snapshots, and inferring
+"Bishop" from callings.
 
 ## Design
 
@@ -26,6 +27,7 @@ The June 2025 prototype is in the git history, and its requirements are in
 | `npm run test:mutation` | Breaks the sanitizer 20 ways and requires the tests to catch each one |
 | `npm run build:bridge`, then `npm run test:e2e` | Real Chromium, real extension, mock LCR. Needs `npx playwright install chromium` once |
 | `npm run build`, then `npm run check:store` | Builds the store package and fails if any trace of the bridge shipped |
+| `node e2e/panel.screenshot.mjs <folder>` | Screenshots of the panel on the mock LCR, after `npm run build:bridge` |
 | `node tools/mock-lcr.mjs` | Fake LCR at `http://127.0.0.1:8766/ministering-proposed-assignments` |
 
 ## Using the bridge on real LCR

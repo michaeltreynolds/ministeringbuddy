@@ -6,4 +6,4 @@ export type { SanitizeResult } from './result';
 export { sanitizeDom } from './sanitizeDom';
 export { sanitizeJson } from './sanitizeJson';
 export { sanitizeUrl } from './sanitizeUrl';
-export { wordsOf } from './leakScan';
+export { hasLeaks, scanForLeaks, wordsOf } from './leakScan';

@@ -1,0 +1,268 @@
+{
+  "props": {
+    "pageProps": {
+      "initialState": {
+        "ministeringData": {
+          "loading": false,
+          "eligibleMinistersAndAssignments": {
+            "eligibleMinisters": [
+              {
+                "personUuid": "p-0",
+                "legacyCmisId": 1000,
+                "name": "Abbott, Aaron"
+              },
+              {
+                "personUuid": "p-1",
+                "legacyCmisId": 1001,
+                "name": "Baker, Ben"
+              },
+              {
+                "personUuid": "p-2",
+                "legacyCmisId": 1002,
+                "name": "Carter, Caleb"
+              },
+              {
+                "personUuid": "p-3",
+                "legacyCmisId": 1003,
+                "name": "Dawson, Dean"
+              },
+              {
+                "personUuid": "p-4",
+                "legacyCmisId": 1004,
+                "name": "Ellis, Ezra"
+              },
+              {
+                "personUuid": "p-5",
+                "legacyCmisId": 1005,
+                "name": "Foster, Finn"
+              },
+              {
+                "personUuid": "p-6",
+                "legacyCmisId": 1006,
+                "name": "Grant, Gideon"
+              },
+              {
+                "personUuid": "p-7",
+                "legacyCmisId": 1007,
+                "name": "Hayes, Hugo"
+              },
+              {
+                "personUuid": "p-8",
+                "legacyCmisId": 1008,
+                "name": "Irwin, Isaac"
+              }
+            ],
+            "eligibleAssignments": [
+              {
+                "personUuid": "p-100",
+                "legacyCmisId": 1100,
+                "name": "Jensen Family"
+              },
+              {
+                "personUuid": "p-101",
+                "legacyCmisId": 1101,
+                "name": "Kimball Family"
+              },
+              {
+                "personUuid": "p-102",
+                "legacyCmisId": 1102,
+                "name": "Larsen Family"
+              },
+              {
+                "personUuid": "p-103",
+                "legacyCmisId": 1103,
+                "name": "Moore Family"
+              },
+              {
+                "personUuid": "p-104",
+                "legacyCmisId": 1104,
+                "name": "Nash Family"
+              },
+              {
+                "personUuid": "p-105",
+                "legacyCmisId": 1105,
+                "name": "Olsen Family"
+              },
+              {
+                "personUuid": "p-106",
+                "legacyCmisId": 1106,
+                "name": "Price Family"
+              },
+              {
+                "personUuid": "p-107",
+                "legacyCmisId": 1107,
+                "name": "Quinn Family"
+              }
+            ]
+          },
+          "elders": [
+            {
+              "districtName": "District 1",
+              "districtUuid": "d-1",
+              "supervisorName": "Abbott, Aaron",
+              "supervisorPersonUuid": "p-0",
+              "supervisorLegacyCmisId": 1000,
+              "companionships": [
+                {
+                  "id": "c-1",
+                  "ministers": [
+                    {
+                      "personUuid": "p-0",
+                      "legacyCmisId": 1000,
+                      "name": "Abbott, Aaron"
+                    },
+                    {
+                      "personUuid": "p-1",
+                      "legacyCmisId": 1001,
+                      "name": "Baker, Ben"
+                    }
+                  ],
+                  "assignments": [
+                    {
+                      "personUuid": "p-100",
+                      "legacyCmisId": 1100,
+                      "name": "Jensen Family"
+                    },
+                    {
+                      "personUuid": "p-101",
+                      "legacyCmisId": 1101,
+                      "name": "Kimball Family"
+                    }
+                  ],
+                  "ministerErrors": [],
+                  "ministerWarnings": [],
+                  "assignmentErrors": [],
+                  "assignmentWarnings": [],
+                  "recentlyChangedDate": "2026-10-01",
+                  "recentlyChangedDateInMilliseconds": 0
+                },
+                {
+                  "id": "c-2",
+                  "ministers": [
+                    {
+                      "personUuid": "p-2",
+                      "legacyCmisId": 1002,
+                      "name": "Carter, Caleb"
+                    }
+                  ],
+                  "assignments": [
+                    {
+                      "personUuid": "p-102",
+                      "legacyCmisId": 1102,
+                      "name": "Larsen Family"
+                    }
+                  ],
+                  "ministerErrors": [],
+                  "ministerWarnings": [],
+                  "assignmentErrors": [],
+                  "assignmentWarnings": [],
+                  "recentlyChangedDate": "2026-10-01",
+                  "recentlyChangedDateInMilliseconds": 0
+                }
+              ]
+            },
+            {
+              "districtName": "District 2",
+              "districtUuid": "d-2",
+              "supervisorName": "Dawson, Dean",
+              "supervisorPersonUuid": "p-3",
+              "supervisorLegacyCmisId": 1003,
+              "companionships": [
+                {
+                  "id": "c-3",
+                  "ministers": [
+                    {
+                      "personUuid": "p-3",
+                      "legacyCmisId": 1003,
+                      "name": "Dawson, Dean"
+                    },
+                    {
+                      "personUuid": "p-4",
+                      "legacyCmisId": 1004,
+                      "name": "Ellis, Ezra"
+                    }
+                  ],
+                  "assignments": [
+                    {
+                      "personUuid": "p-103",
+                      "legacyCmisId": 1103,
+                      "name": "Moore Family"
+                    }
+                  ],
+                  "ministerErrors": [],
+                  "ministerWarnings": [],
+                  "assignmentErrors": [],
+                  "assignmentWarnings": [],
+                  "recentlyChangedDate": "2026-10-01",
+                  "recentlyChangedDateInMilliseconds": 0
+                },
+                {
+                  "id": "c-4",
+                  "ministers": [
+                    {
+                      "personUuid": "p-5",
+                      "legacyCmisId": 1005,
+                      "name": "Foster, Finn"
+                    }
+                  ],
+                  "assignments": [],
+                  "ministerErrors": [],
+                  "ministerWarnings": [],
+                  "assignmentErrors": [],
+                  "assignmentWarnings": [],
+                  "recentlyChangedDate": "2026-10-01",
+                  "recentlyChangedDateInMilliseconds": 0
+                }
+              ]
+            }
+          ],
+          "currentElders": [
+            {
+              "districtName": "District 1",
+              "districtUuid": "d-1",
+              "supervisorName": "Abbott, Aaron",
+              "supervisorPersonUuid": "p-0",
+              "supervisorLegacyCmisId": 1000,
+              "companionships": [
+                {
+                  "id": "c-1",
+                  "ministers": [
+                    {
+                      "personUuid": "p-0",
+                      "legacyCmisId": 1000,
+                      "name": "Abbott, Aaron"
+                    },
+                    {
+                      "personUuid": "p-1",
+                      "legacyCmisId": 1001,
+                      "name": "Baker, Ben"
+                    }
+                  ],
+                  "assignments": [
+                    {
+                      "personUuid": "p-100",
+                      "legacyCmisId": 1100,
+                      "name": "Jensen Family"
+                    }
+                  ],
+                  "ministerErrors": [],
+                  "ministerWarnings": [],
+                  "assignmentErrors": [],
+                  "assignmentWarnings": [],
+                  "recentlyChangedDate": "2026-10-01",
+                  "recentlyChangedDateInMilliseconds": 0
+                }
+              ]
+            }
+          ],
+          "eldersQuorumSupervisors": [],
+          "isSandboxAction": true
+        }
+      }
+    }
+  },
+  "page": "/ministering-proposed-assignments",
+  "query": {
+    "type": "EQ"
+  }
+}

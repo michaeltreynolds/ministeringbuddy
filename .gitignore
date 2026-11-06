@@ -5,3 +5,5 @@ node_modules/
 e2e/.profile/
 # Unsanitized captures must never be committed. Sanitized fixtures go in tests/fixtures/.
 private/
+e2e/.profile-panel/
+e2e/screenshots/

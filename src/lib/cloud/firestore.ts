@@ -69,6 +69,28 @@ export class FirestoreClient {
     await this.#request('PATCH', documentPath(path), { fields: encodeFields(data) });
   }
 
+  async delete(path: string): Promise<void> {
+    await this.#request('DELETE', documentPath(path));
+  }
+
+  /** Every document in a top-level collection, following page tokens. */
+  async list(collection: string): Promise<{ id: string; data: { [key: string]: Plain } }[]> {
+    if (!/^[\w-]+$/.test(collection)) throw new Error('A collection name is letters, digits, - and _ only.');
+    const documents: { id: string; data: { [key: string]: Plain } }[] = [];
+    let pageToken = '';
+    do {
+      const query = `pageSize=300${pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : ''}`;
+      const response = await this.#request('GET', `${collection}?${query}`);
+      if (response.status === 404) break;
+      const page = await response.json();
+      for (const document of page.documents ?? []) {
+        documents.push({ id: String(document.name).split('/').pop()!, data: decodeFields(document.fields ?? {}) });
+      }
+      pageToken = page.nextPageToken ?? '';
+    } while (pageToken);
+    return documents;
+  }
+
   async #request(method: string, path: string, body?: unknown): Promise<Response> {
     const send = async (refresh: boolean) =>
       this.fetchImpl(`${this.baseUrl}/${path}`, {
