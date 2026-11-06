@@ -32,6 +32,20 @@ describe('FirestoreClient', () => {
     return { calls, impl };
   }
 
+  it('calls the global fetch on the global object, as browsers require', async () => {
+    const realFetch = globalThis.fetch;
+    globalThis.fetch = function (this: unknown) {
+      // Chrome throws "Illegal invocation" when fetch is called on any other object.
+      if (this !== undefined && this !== globalThis) throw new TypeError('Illegal invocation');
+      return Promise.resolve(new Response('{}'));
+    } as typeof fetch;
+    try {
+      await new FirestoreClient('https://base', async () => 'token').get('meta/connection');
+    } finally {
+      globalThis.fetch = realFetch;
+    }
+  });
+
   it('reads a document', async () => {
     const { impl } = fakeFetch([new Response(JSON.stringify({ fields: { lastCheck: { stringValue: 'x' } } }))]);
     const client = new FirestoreClient('https://base', async () => 'token', impl);

@@ -54,7 +54,8 @@ export class FirestoreClient {
   constructor(
     private readonly baseUrl: string,
     private readonly getToken: TokenProvider,
-    private readonly fetchImpl: typeof fetch = fetch,
+    // A wrapper, not `fetch` itself: called as this.fetchImpl(), the browser's fetch throws "Illegal invocation".
+    private readonly fetchImpl: typeof fetch = (input, init) => fetch(input, init),
   ) {}
 
   async get(path: string): Promise<{ [key: string]: Plain } | null> {
