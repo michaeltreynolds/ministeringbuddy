@@ -4,8 +4,17 @@ Captured 2026-11-05 through the sanitized bridge from the EQ Proposed Assignment
 (`/ministering-proposed-assignments?type=EQ`). Field names only; no values. The outer container
 names were hidden by the sanitizer, so paths start at the first named field.
 
-There is no separate API call: the page embeds everything in its Next.js `__NEXT_DATA__` script
-(about 850 KB). The extension can read it from the page, or fetch the page and parse that script.
+There is no separate API call: each page embeds its data in a Next.js `__NEXT_DATA__` script.
+The extension can read it from an open page, or fetch the page and parse that script
+(`node tools/bridge.mjs next <path>` does this).
+
+| Page | Embedded data |
+| --- | --- |
+| `/ministering-proposed-assignments?lang=eng&type=EQ` (with or without `&tab=unassigned`) | Two district lists, current and draft, plus the people list. Both tabs embed identical data. |
+| `/ministering?lang=eng&type=EQ` | One district list: current, published assignments. It matches one of the two lists above. |
+
+So one fetch of the Proposed page gives both what's published and the draft. Which of its two lists is the
+draft has not been confirmed by field name, because both container names are hidden by the sanitizer.
 
 ## Districts (array, 3 in this ward)
 - `districtName`, `districtUuid`

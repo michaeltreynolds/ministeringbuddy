@@ -7,7 +7,7 @@ import { WebSocketServer } from 'ws';
 
 const PORT = 8765;
 const TIMEOUT_MS = 30_000;
-const ALLOWED_COMMANDS = new Set(['status', 'dom', 'fetch', 'network', 'scripts', 'embedded', 'reload', 'reload-page']);
+const ALLOWED_COMMANDS = new Set(['status', 'dom', 'fetch', 'network', 'scripts', 'embedded', 'next', 'reload', 'reload-page']);
 
 const token = randomBytes(24).toString('hex');
 

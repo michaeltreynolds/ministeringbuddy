@@ -17,7 +17,8 @@ export type BridgeCommand =
   | { command: 'fetch'; path: string }
   | { command: 'network' }
   | { command: 'scripts' }
-  | { command: 'embedded'; index: number };
+  | { command: 'embedded'; index: number }
+  | { command: 'next'; path: string };
 
 export type BridgeResult = SanitizeResult | { ok: false; error: string };
 
@@ -122,6 +123,20 @@ function runEmbedded(index: number): BridgeResult {
   }
 }
 
+/** Fetches an LCR page and returns the sanitized shape of its embedded Next.js data. */
+async function runNext(path: string): Promise<BridgeResult> {
+  if (!isSameOriginPath(path)) return { ok: false, error: 'Only same-origin relative paths are allowed.' };
+  const response = await fetch(path, { method: 'GET', credentials: 'include' });
+  const page = new DOMParser().parseFromString(await response.text(), 'text/html');
+  const script = page.querySelector('script#__NEXT_DATA__');
+  if (!script) return { ok: false, error: `No __NEXT_DATA__ in that page (status ${response.status}).` };
+  try {
+    return sanitizeJson(JSON.parse(script.textContent ?? ''), discoveryPolicy(), session);
+  } catch {
+    return { ok: false, error: 'The embedded data is not JSON.' };
+  }
+}
+
 export async function runBridgeCommand(request: BridgeCommand): Promise<BridgeResult> {
   switch (request.command) {
     case 'status':
@@ -136,6 +151,8 @@ export async function runBridgeCommand(request: BridgeCommand): Promise<BridgeRe
       return runScripts();
     case 'embedded':
       return runEmbedded(Number(request.index));
+    case 'next':
+      return runNext(request.path);
     default:
       return { ok: false, error: 'Unknown command.' };
   }
